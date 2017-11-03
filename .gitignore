@@ -64,5 +64,6 @@ ReleaseGLEW/
 *.out
 *.opensdf
 GLFW/obj
+obj
 headers
 shaders

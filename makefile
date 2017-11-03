@@ -16,6 +16,8 @@ LIBDIR=-L/usr/X11R6 -L/usr/local/lib
 
 LIBS=
 
+
+
 OS_NAME:=$(shell uname -s)
 
 ifeq ($(OS_NAME),Darwin)
