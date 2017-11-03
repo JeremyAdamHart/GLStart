@@ -14,7 +14,7 @@ The patterns of the noise can be manipulated by modifying the shaders. Press the
 
 For the 2D mode, the following parameters are useful to modify in shaders/pnoise2D.frag:
 
-<p style="font-family: monospace;"> 
+<pre> 
 //Perlin noise values
 uniform int octaveNum = 5;			//The number of octaves of noise ie: Number of layers of noise stacked ontop of each other
 uniform float baseWidth = 0.1;		//The width of the lowest resolution grid
@@ -28,15 +28,15 @@ main()
 ...
 
 float intensity = noise;
-</p>
+</pre>
 
 As well as changing the intensity function in main.
 
 Corresponding parameters also exist in shaders/ambient.frag. Similarily changing this function to sinLines can modify the pattern.
 
-<p style="font-family: monospace;">
+<pre>
 	float intensity = radialSin(coord, noise*turbulence);
-</p>
+</pre>
 
 
 
