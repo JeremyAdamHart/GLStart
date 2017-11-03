@@ -16,8 +16,6 @@ LIBDIR=-L/usr/X11R6 -L/usr/local/lib
 
 LIBS=
 
-
-
 OS_NAME:=$(shell uname -s)
 
 ifeq ($(OS_NAME),Darwin)
@@ -45,16 +43,11 @@ HEADERS=-Iheaders -Iinclude
 ENGINE_OBJS=$(addprefix $(ENGINE_DIR)/obj/,$(notdir $(ENGINE_SOURCES:.cpp=.o)))
 
 .PHONY: default
-default:  fetch buildDirectories $(ENGINE_DIR)/renderingengine.out
+default:  fetch buildDirectories $(ENGINE_DIR)/perlinNoise.out
 	echo "Build completed"
-ifeq ($(OS_NAME),Darwin)
-$(ENGINE_DIR)/renderingengine.out: librenderingcore.a librenderingextensions.a
-	$(CC) $(LINK_FLAGS) $(ENGINE_OBJS) $(CORE_OBJS) $(EXTENSION_OBJS) -o $@ -L. $(LIBS)
-endif
-ifeq ($(OS_NAME),Linux)
-$(ENGINE_DIR)/renderingengine.out: $(ENGINE_OBJS)
+
+$(ENGINE_DIR)/perlinNoise.out: $(ENGINE_OBJS)
 	$(CC) $(LINK_FLAGS) $(ENGINE_OBJS) -o $@ -L. -lrenderingextensions -lrenderingcore $(LIBS)
-endif
 
 all: $(ENGINE_DIR)/perlinNoise.out 
 
@@ -78,4 +71,4 @@ buildDirectories:
 
 .PHONY: clean
 clean:
-	rm *.a $(ENGINE_DIR)/*.out $(CORE_DIR)/obj/*.o $(EXTENSION_DIR)/obj/*.o $(ENGINE_DIR)/obj/*.o
+	rm $(ENGINE_DIR)/*.out $(CORE_DIR)/obj/*.o $(EXTENSION_DIR)/obj/*.o $(ENGINE_DIR)/obj/*.o

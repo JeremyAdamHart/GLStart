@@ -77,7 +77,7 @@ window_width(800), window_height(800)
 	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);	
 	window = createWindow(window_width, window_height, 
-		"You really should rename this");
+		"Perlin Noise");
 
 	glfwMakeContextCurrent(window);
 	initGLExtensions();
