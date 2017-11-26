@@ -67,3 +67,4 @@ GLFW/obj
 obj
 headers
 shaders
+*.opendb
