@@ -21,7 +21,7 @@
   <PropertyGroup Label="Globals">
     <ProjectGuid>{89E7A891-98C3-4940-9128-5F35E472BEB7}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
-    <RootNamespace>PerlinNoise</RootNamespace>
+    <RootNamespace>BranchingPoints</RootNamespace>
     <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
