@@ -12,7 +12,7 @@ endif
 
 INCDIR= -I./include
 
-LIBDIR=-L/usr/X11R6 -L/usr/local/lib
+LIBDIR=-L/usr/X11R6 -L/usr/local/lib -L../RenderingEngineLibrary
 
 LIBS=
 
@@ -43,16 +43,16 @@ HEADERS=-Iheaders -Iinclude
 ENGINE_OBJS=$(addprefix $(ENGINE_DIR)/obj/,$(notdir $(ENGINE_SOURCES:.cpp=.o)))
 
 .PHONY: default
-default:  fetch buildDirectories $(ENGINE_DIR)/perlinNoise.out
+default:  fetch buildDirectories $(ENGINE_DIR)/GLStart.out
 	echo "Build completed"
 
-$(ENGINE_DIR)/perlinNoise.out: $(ENGINE_OBJS)
-	$(CC) $(LINK_FLAGS) $(ENGINE_OBJS) -o $@ -L. -lrenderingextensions -lrenderingcore $(LIBS)
+$(ENGINE_DIR)/GLStart.out: $(ENGINE_OBJS)
+	$(CC) $(LINK_FLAGS) $(ENGINE_OBJS) -o $@ -L. -lrenderingextensions -lrenderingcore $(LIBS) $(LIBDIR)
 
-all: $(ENGINE_DIR)/perlinNoise.out 
+all: $(ENGINE_DIR)/GLStart.out 
 
 $(ENGINE_DIR)/obj/%.o: $(ENGINE_DIR)/%.cpp
-	$(CC) -c $(CFLAGS) $(ENGINE_HEADERS) $(HEADERS) $(INCDIR) $< -o $@
+	$(CC) -c $(CFLAGS) $(ENGINE_HEADERS) $(HEADERS) $(INCDIR) $(LIBDIR) $< -o $@
 
 .PHONY: fetch
 fetch: 
@@ -71,4 +71,4 @@ buildDirectories:
 
 .PHONY: clean
 clean:
-	rm $(ENGINE_DIR)/*.out $(CORE_DIR)/obj/*.o $(EXTENSION_DIR)/obj/*.o $(ENGINE_DIR)/obj/*.o
+	rm $(ENGINE_DIR)/*.out $(ENGINE_DIR)/obj/*.o
