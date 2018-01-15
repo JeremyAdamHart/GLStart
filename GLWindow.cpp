@@ -32,7 +32,6 @@ TrackballCamera cam(
 	vec3(0, 0, -1), vec3(0, 0, 1),
 	glm::perspective(90.f*3.14159f/180.f, 1.f, 0.1f, 3.f));
 
-bool reloadShaders = false;
 bool windowResized = false;
 int windowWidth, windowHeight;
 
@@ -60,10 +59,6 @@ void windowResizeCallback(GLFWwindow* window, int width, int height) {
 	windowHeight = height;
 }
 
-void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods) {
-	if (key == GLFW_KEY_SPACE && action == GLFW_RELEASE)
-		reloadShaders = true;
-}
 
 WindowManager::WindowManager() :
 window_width(800), window_height(800)
@@ -114,117 +109,12 @@ WindowManager::WindowManager(int width, int height, std::string name, glm::vec4 
 	glViewport(0, 0, window_width, window_height);
 }
 
-#define M_PI 3.1415926535897932384626433832795
-#define MOD_MAX 8388608
 
-
-void WindowManager::noiseLoop() {
-	vec3 points[6] = {
-		//First triangle
-		vec3(-0.5f, 0.5f, 0.f)*2.f,
-		vec3(0.5f, 0.5f, 0.f)*2.f,
-		vec3(0.5f, -0.5f, 0.f)*2.f,
-		//Second triangle
-		vec3(0.5f, -0.5f, 0.f)*2.f,
-		vec3(-0.5f, -0.5f, 0.f)*2.f,
-		vec3(-0.5f, 0.5f, 0.f)*2.f
-	};
-
-	vec2 coords[6] = {
-		//First triangle
-		vec2(0, 1.f),
-		vec2(1.f, 1.f),
-		vec2(1.f, 0.f),
-		//Second triangle
-		vec2(1.f, 0.f),
-		vec2(0.f, 0.f),
-		vec2(0.f, 1.f)
-	};
-
-	glfwSetKeyCallback(window, keyCallback);
-	glfwSetWindowSizeCallback(window, windowResizeCallback);
-
-	SimpleTexManager tm;
-	PerlinNoiseShader2D perlinShader;
-	Drawable texSquare(
-		new TextureMat(createTexture2D(1, 1, &tm)),
-		new SimpleTexGeometry(points, coords, 6, GL_TRIANGLES));
-
-	while (!glfwWindowShouldClose(window)) {
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-		if (reloadShaders) {
-			perlinShader.createProgram();
-			reloadShaders = false;
-		}
-		if (windowResized) {
-			window_width = windowWidth;
-			window_height = windowHeight;
-			glViewport(0, 0, window_width, window_height);
-		}
-
-		perlinShader.draw(cam, texSquare);
-
-
-		glfwSwapBuffers(window);
-		glfwWaitEvents();
-	}
-
-	glfwTerminate();
-}
-
-//Temporary testing
 void WindowManager::mainLoop() {
 
-	glfwSetKeyCallback(window, keyCallback);
 	glfwSetWindowSizeCallback(window, windowResizeCallback);
-	//glfwSetCursorPosCallback(window, cursorPositionCallback);
 
-	vec3 points [6] = {
-		//First triangle
-		vec3(-0.5f, 0.5f, 0.f)*2.f,
-		vec3(0.5f, 0.5f, 0.f)*2.f,
-		vec3(0.5f, -0.5f, 0.f)*2.f,
-		//Second triangle
-		vec3(0.5f, -0.5f, 0.f)*2.f,
-		vec3(-0.5f, -0.5f, 0.f)*2.f,
-		vec3(-0.5f, 0.5f, 0.f)*2.f
-	};
-
-	vec2 coords[6] = {
-		//First triangle
-		vec2(0, 1.f),
-		vec2(1.f, 1.f),
-		vec2(1.f, 0.f),
-		//Second triangle
-		vec2(1.f, 0.f),
-		vec2(0.f, 0.f),
-		vec2(0.f, 1.f)
-	};
 	SimpleTexManager tm;
-
-	//AO framebuffer
-	Framebuffer pnFbo = createNewFramebuffer(window_width, window_height);
-	pnFbo.addTexture(createTexture2D(
-		TexInfo(GL_TEXTURE_2D, {window_width, window_height}, 0, GL_RGB, GL_RGB32F, GL_FLOAT), &tm), 
-		GL_COLOR_ATTACHMENT0);
-
-	pnFbo.addTexture(createTexture2D(
-		TexInfo(GL_TEXTURE_2D, {window_width, window_height}, 0, GL_RGB, GL_RGB32F, GL_FLOAT), &tm), 
-		GL_COLOR_ATTACHMENT1);
-	pnFbo.addTexture(createDepthTexture(window_width, window_height, &tm), GL_DEPTH_ATTACHMENT);
-
-	Framebuffer fbWindow (window_width, window_height);
-	const int TEX_WIDTH = 160;
-	const int TEX_HEIGHT = 160;
-	Framebuffer fbTex = createNewFramebuffer(TEX_WIDTH, TEX_HEIGHT);
-	
-	if (!fbTex.addTexture(createTexture2D(TEX_WIDTH, TEX_HEIGHT, &tm),
-		GL_COLOR_ATTACHMENT0) ||
-		!fbTex.addTexture(createDepthTexture(TEX_WIDTH, TEX_HEIGHT, &tm),
-			GL_DEPTH_ATTACHMENT)) {
-		std::cout << "FBO creation failed" << endl;
-	}
 
 	//Dragon
 	ElementGeometry dragonGeom = objToElementGeometry("models/dragon.obj");
@@ -233,76 +123,24 @@ void WindowManager::mainLoop() {
 		&dragonGeom);
 	dragon.addMaterial(new ShadedMat(0.2f, 0.5f, 0.3f, 10.f));
 
-	Drawable texSquare(
-		new TextureMat(fbTex.getTexture(GL_COLOR_ATTACHMENT0)),
-		new SimpleTexGeometry(points, coords, 6, GL_TRIANGLES));
-
-	texSquare.addMaterial(new TextureMat(pnFbo.getTexture(GL_COLOR_ATTACHMENT0), TextureMat::POSITION));
-	texSquare.addMaterial(new TextureMat(pnFbo.getTexture(GL_COLOR_ATTACHMENT1), TextureMat::NORMAL));
-
-	SimpleTexShader texShader;
-	SimpleShader shader;
 	TorranceSparrowShader tsShader;
-	TorranceSparrowShader tsTexShader(
-	{ { GL_VERTEX_SHADER, "#define USING_TEXTURE\n" },
-	{ GL_FRAGMENT_SHADER, "#define USING_TEXTURE\n"} });
-
-	fbTex.use();
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	tsShader.draw(cam, vec3(10.f, 10.f, 10.f), dragon);
-
-	fbWindow.use();
-
-	PosNormalShader pnShader;
-	AOShader aoShader;
-
-	vector<Drawable> drawables;
 
 	vec3 lightPos(10.f, 10.f, 10.f);
 
-	for (int i = 0; i < drawables.size(); i++) {
-		drawables[i].setScale(vec3(0.5f));
-	}
-
 	while (!glfwWindowShouldClose(window)) {
 
-		if (reloadShaders) {
-			aoShader.createProgram();
-			reloadShaders = false;
-		}
 		if (windowResized) {
 			window_width = windowWidth;
 			window_height = windowHeight;
-			pnFbo.resize(window_width, window_height);
-			fbWindow.resize(window_width, window_height);
 		}
 
-		//texShader.draw(cam, texSquare);
-
-		//Render dragon with Ambient Occlusion
-		pnFbo.use();
-		glClearColor(0.f, 0.f, 0.f, 1.f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		pnShader.draw(cam, vec3(0, 0, 0), dragon);
-		fbWindow.use();
-		glClearColor(1.f, 1.f, 1.f, 1.f);
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		aoShader.draw(cam, vec3(10.f, 10.f, 10.f), texSquare);
 
-		texShader.draw(cam, texSquare);
-
+		tsShader.draw(cam, lightPos, dragon);
+		
 		glfwSwapBuffers(window);
-		glfwWaitEvents();
+		glfwPollEvents();
 	}
-
-	delete texSquare.getMaterial(TextureMat::id);
-	delete texSquare.getGeometryPtr();
-
-	delete dragon.getMaterial(ColorMat::id);
-	delete dragon.getMaterial(ShadedMat::id);
-
-	fbTex.deleteFramebuffer();
-	fbTex.deleteTextures();
 
 	glfwTerminate();
 }

@@ -21,7 +21,7 @@
   <PropertyGroup Label="Globals">
     <ProjectGuid>{89E7A891-98C3-4940-9128-5F35E472BEB7}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
-    <RootNamespace>BranchingPoints</RootNamespace>
+    <RootNamespace>GLStart</RootNamespace>
     <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -158,13 +158,10 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GLWindow.h" />
-    <ClInclude Include="PerlinNoise.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="GLWindow.cpp" />
     <ClCompile Include="Main.cpp" />
-    <ClCompile Include="PerlinNoise.cpp" />
-    <ClCompile Include="PerlinNoiseMain.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
